@@ -25,14 +25,38 @@
 
 <body>
   <!-- your content here... -->
-  <form id="regiseteration-form" method="POST" target="http://127.0.0.1:5000/user_profile">
+  <form id="regiseteration-form" method="POST" target="hiddenframe" action="http://127.0.0.1:5000/users">
     <div>Choose new username <input id="username" name="username" placeholder="username" required></div>
     <div>Please typr your full name <input id="name" name="name" placeholder="name" required></div>
     <div>Please type your email<input id="email" name="email" placeholder="email" required></div>
     <div>Please type your phone number<input id="phone" name="phone" placeholder="phone" required></div>
     <div>Please type your new password <input id="password" name="password" type="password" required></div>
-    <div><input id="submit-button" type="submit" action="http://127.0.0.1:5000/register"></div>
+    <div><button class="button-submit" id="button-submit" type="submit">Submit Request</button></div>
   </form>
   <!-- <script src="js/scripts.js"></script> -->
+  <!-- Submits a form to post request -->
+  <script>
+    window.addEventListener("load", function() {
+      const form = document.getElementById('regiseteration-form');
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const data = new FormData(form);
+        const action = e.target.action;
+        return fetch(action, {
+          method: 'POST',
+          body: data,
+        })
+        .then((res) => {
+          return res.json();
+        })
+        .then((json) => {
+          console.log(json); // The json object is here
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
