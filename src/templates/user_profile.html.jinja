@@ -1,0 +1,59 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>A Basic HTML5 Template</title>
+  <meta name="description" content="A simple HTML5 Template for new projects.">
+  <meta name="author" content="SitePoint">
+
+  <meta property="og:title" content="A Basic HTML5 Template">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.sitepoint.com/a-basic-html5-template/">
+  <meta property="og:description" content="A simple HTML5 Template for new projects.">
+  <!-- <meta property="og:image" content="image.png">
+
+  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+
+</head>
+
+<body>
+  <!-- your content here... -->
+  <div>username: <a id="username"></a></div>
+  <div>name: <a id="name"></a></div>
+  <div>email: <a id="email"></a></div>
+  <div>phone: <a id="phone"></a></div>
+  <div>userid: <a id="id"></a></div>
+  <!-- <script src="js/scripts.js"></script> -->
+  <script>
+    var url  = "http://127.0.0.1:5000/users/1";
+    var xhr  = new XMLHttpRequest()
+    xhr.open('GET', url, true)
+    xhr.onload = function () {
+        var response = JSON.parse(xhr.responseText);
+        if (xhr.readyState == 4 && xhr.status == "200") {
+            var username,name,email,phone,id;
+            username = response[0]["username"];
+            name = response[0]["name"];
+            email = response[0]["email"];
+            phone = response[0]["phone"];
+            id = response[0]["id"];
+            document.getElementById('username').innerHTML = username;
+            document.getElementById('name').innerHTML = name;
+            document.getElementById('email').innerHTML = email;
+            document.getElementById('phone').innerHTML = phone;
+            document.getElementById('id').innerHTML = id;
+        } else {
+            console.error(response);
+        }
+    }
+    xhr.send(null);
+  </script>
+</body>
+</html>
