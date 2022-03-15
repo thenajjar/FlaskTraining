@@ -9,12 +9,24 @@ auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 app_token = os.getenv('TWILIO_VERIFY_APP_TOKEN')
 
 client = Client(account_sid, auth_token)
-try:
-    verification = client.verify \
-        .services(app_token) \
-        .verifications \
-        .create(to='+966541942414', channel='sms')
-    print(verification.sid)
-except Exception as error_message:
-    print(error_message)
+def send_otp_sms(phone):
+    try:
+        verification = client.verify \
+            .services(app_token) \
+            .verifications \
+            .create(to=phone, channel='sms')
+        print(verification.sid)
+        return(verification.sid)
+    except Exception as error_message:
+        print(error_message)
     
+def verify_otp_sms(phone, code):
+    try:
+        verification_check = client.verify \
+            .services(app_token) \
+            .verification_checks \
+            .create(to=phone, code=code)
+        if verification_check.status == "approved":
+            return True
+    except Exception as error_message:
+        print(error_message)

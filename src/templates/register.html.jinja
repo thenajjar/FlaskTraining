@@ -20,43 +20,102 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+  <style>
+    .hide { position:absolute; top:-1px; left:-1px; width:1px; height:1px; }
+  </style>
 
 </head>
 
 <body>
   <!-- your content here... -->
-  <form id="regiseteration-form" method="POST" target="hiddenframe" action="http://127.0.0.1:5000/users">
+
+  <iframe name="hiddenFrame" class="hide"></iframe>
+  <form id="regiseteration-form" method="POST" target="hiddenFrame" action="http://127.0.0.1:5000/users">
     <div>Choose new username <input id="username" name="username" placeholder="username" required></div>
     <div>Please typr your full name <input id="name" name="name" placeholder="name" required></div>
-    <div>Please type your email<input id="email" name="email" placeholder="email" required></div>
-    <div>Please type your phone number<input id="phone" name="phone" placeholder="phone" required></div>
+    <div>Please type your email<input id="email" name="email" type="email" placeholder="email" required></div>
+    <div>Please type your phone number<input id="phone" name="phone" placeholder="phone" type="tel" required></div>
     <div>Please type your new password <input id="password" name="password" type="password" required></div>
     <div><button class="button-submit" id="button-submit" type="submit">Submit Request</button></div>
   </form>
+  <div id="otp-div"></div>
+  <div id="success"></div>
   <!-- <script src="js/scripts.js"></script> -->
   <!-- Submits a form to post request -->
   <script>
     window.addEventListener("load", function() {
       const form = document.getElementById('regiseteration-form');
+      var user_id = "";
       form.addEventListener("submit", function(e) {
         e.preventDefault();
         const data = new FormData(form);
         const action = e.target.action;
+        var status = "";
         return fetch(action, {
           method: 'POST',
           body: data,
         })
         .then((res) => {
+          if (res.ok) {
+            status = "ok";
+          }
           return res.json();
         })
         .then((json) => {
-          console.log(json); // The json object is here
+          if (status == "ok"){ 
+            user_id = json["data"]["id"];
+            console.log(user_id);
+            console.log(json)
+            document.getElementById('button-submit').disabled = true;
+            document.getElementById('button-submit').innerHTML = "Submitted!";
+            document.getElementById('otp-div').innerHTML = '<form id="otp-form" method="POST" target="hiddenFrame" action="http://127.0.0.1:5000/verify/user_id"><div>Please type the code you recieved in your mobile <input id="otp" name="otp" type="number" required></div><div id="error"></div><div><button class="button-submit" id="otp-submit" type="submit">Confirm</button></div></form>'.replace("user_id", user_id);
+            otp_start();
+          }
         })
         .catch((err) => {
           console.log(err);
         });
       });
     });
+  </script>
+  <script>
+    function otp_start(){
+      const form = document.getElementById('otp-form');
+      form.addEventListener("submit", function(e) {
+        document.getElementById('error').innerHTML = '';
+        e.preventDefault();
+        const data = new FormData(form);
+        const action = e.target.action;
+        var status = "";
+        return fetch(action, {
+          method: 'POST',
+          body: data,
+        })
+        .then((res) => {
+          if (res.ok) {
+            status = "ok";
+          }
+          if (res.conflict) {
+            status = "conflict";
+          }
+          return res.json();
+        })
+        .then((json) => {
+          if (status == "ok"){
+            console.log(json);
+            document.getElementById('otp-submit').disabled = true;
+            document.getElementById('otp-submit').innerHTML = "Confirmed!";
+            document.getElementById('success').innerHTML = '<a>Registered successfully!</a>';
+          }
+          if (status == "conflict"){
+            document.getElementById('error').innerHTML = '<a>Wrong OTP</a>';
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      });
+    };
   </script>
 </body>
 </html>
