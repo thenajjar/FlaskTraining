@@ -4,8 +4,10 @@ flask-sqlalchemy
 twilio
 psycopg2
 sqlalchemy
-sendgrid
 python-dotenv
-python-crontab
 markupsafe
 flask-apispec
+Flask-WTF
+wtforms
+email_validator
+pyjwt

@@ -9,6 +9,8 @@ auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 app_token = os.getenv('TWILIO_VERIFY_APP_TOKEN')
 
 client = Client(account_sid, auth_token)
+
+
 def send_otp_sms(phone):
     try:
         verification = client.verify \
@@ -19,7 +21,8 @@ def send_otp_sms(phone):
         return(verification.sid)
     except Exception as error_message:
         print(error_message)
-    
+
+
 def verify_otp_sms(phone, code):
     try:
         verification_check = client.verify \

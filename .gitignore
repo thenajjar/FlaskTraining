@@ -1,2 +1,5 @@
 .env
 .scannerwork
+.vscode
+**/database.ini
+**/__pycache__
