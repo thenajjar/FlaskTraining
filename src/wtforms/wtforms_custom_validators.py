@@ -1,5 +1,5 @@
 from wtforms.validators import ValidationError
-from src.database.users import db_value_exists
+from src.database.users import users_db
 
 
 class unique_value(object):
@@ -14,7 +14,7 @@ class unique_value(object):
         field_id = field.id
         if not self.message:
             self.message = 'The {} already exists'.format(field_id)
-        if db_value_exists(field_id, field.data):
+        if users_db.exists(field_id, field.data):
             raise ValidationError(self.message)
 
 
@@ -30,7 +30,7 @@ class exists(object):
         field_id = field.id
         if not self.message:
             self.message = 'The {} already exists'.format(field_id)
-        if not db_value_exists(field_id, field.data):
+        if not users_db.exists(field_id, field.data):
             raise ValidationError(self.message)
 
 

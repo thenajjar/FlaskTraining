@@ -1,4 +1,4 @@
-from src.database.users import create_user, get_user
+from src.database.users import users_db
 from src.twilio.verify import send_otp_sms, verify_otp_sms
 from src.swagger.swagger_schemas import *
 from src.wtforms.wtforms_templates import *
@@ -77,7 +77,8 @@ class users_api(MethodResource, Resource):
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         try:
-            user_id = create_user(name, username, email, phone, password)
+            user_id = users_db.create_user(
+                name, username, email, phone, password)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         # otp_status = send_otp_sms(phone)
@@ -85,23 +86,13 @@ class users_api(MethodResource, Resource):
         if otp_status:
             return Response(
                 response=json.dumps({
-                    "data": {
-                        "user_id": user_id,
-                    }
+                    "user_id": user_id,
                 }),
                 status=201,
                 mimetype="application/json"
             )
         else:
-            return Response(
-                response=json.dumps({
-                    "data": {
-                        "user_id": user_id,
-                    }
-                }),
-                status=405,
-                mimetype="application/json"
-            )
+            return error_response("409", "CONFLICT", "OTP status error.", otp_status)
 
 
 class users_api_get(MethodResource, Resource):
@@ -112,18 +103,16 @@ class users_api_get(MethodResource, Resource):
         """ Take a userid and returns the data of that user
         """
         try:
-            _, name, username, email, _, phone = get_user(user_id)
+            _, name, username, email, _, phone = users_db.get_user(user_id)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         return Response(
             response=json.dumps({
-                "data": {
-                    "user_id": user_id,
-                    "email": email,
-                    "username": username,
-                    "name": name,
-                    "phone": phone
-                }
+                "user_id": user_id,
+                "email": email,
+                "username": username,
+                "name": name,
+                "phone": phone
             }),
             status=200,
             mimetype="application/json"
@@ -153,7 +142,7 @@ class verify_api(MethodResource, Resource):
         user_id = request.form['user_id']
         otp = request.form['otp']
         try:
-            _, name, username, email, _, phone = get_user(user_id)
+            _, name, username, email, _, phone = users_db.get_user(user_id)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         try:
@@ -163,28 +152,14 @@ class verify_api(MethodResource, Resource):
         if verify_status:
             return Response(
                 response=json.dumps({
-                    "data": {
-                        "user_id": user_id,
-                        "email": email,
-                        "username": username,
-                        "name": name,
-                        "phone": phone
-                    }
+                    "user_id": user_id,
+                    "email": email,
+                    "username": username,
+                    "name": name,
+                    "phone": phone
                 }),
                 status=200,
                 mimetype="application/json"
             )
         else:
-            return Response(
-                response=json.dumps({
-                    "data": {
-                        "user_id": user_id,
-                        "email": email,
-                        "username": username,
-                        "name": name,
-                        "phone": phone
-                    }
-                }),
-                status=409,
-                mimetype="application/json"
-            )
+            return error_response("409", "CONFLICT", "OTP verfication failed.", verify_status)

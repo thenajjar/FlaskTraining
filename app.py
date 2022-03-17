@@ -1,4 +1,3 @@
-# from src.database_module.users import create_table
 from src.routes.flask_routes import *
 from src.config.config import app_configs
 
@@ -20,25 +19,20 @@ app.config.update(app_configs.settings['flask'])
 # generate swagger documentation
 docs = FlaskApiSpec(app)
 
+# define flask routes and link them to the api resource classes
 api.add_resource(users_api, '/users')
 api.add_resource(users_api_get, '/users/<string:user_id>')
 api.add_resource(verify_api, '/verify')
+
+# register swagger docs to each api resouce
 docs.register(users_api)
 docs.register(users_api_get)
 docs.register(verify_api)
 
 
-def main(args=None):
-    if args:
-        print(type(args))
-    # create_table()
+def main():
     app.run()
 
 
 if __name__ == "__main__":
-    try:
-        create_db_arg = str(sys.argv[1])
-        print(create_db_arg)
-        main(create_db_arg)
-    except:
-        main()
+    main()
