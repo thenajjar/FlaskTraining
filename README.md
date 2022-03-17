@@ -1,4 +1,4 @@
-# Flask Training Project
+# Flask User Registration API
 A project to train on REST API, PostgresSQL, Flask, Cron, Dockers
 
 # Installation
@@ -7,21 +7,22 @@ Create a local folder for your repo in your Windows OS
 Open CMD and change directory to your local repo folder
 Execute the follwing command in CMD to clone the repo
 ```
-git clone https://github.com/thenajjar/FlaskTraining.git
+git clone https://github.com/thenajjar/Flask_User_Registration_API.git
 ```
-Change the directory to the project folder "FlaskTraining"
-Make a copy of .env file and add a name after for example ".env.var"
-Add your twilio api keys
-Change to src folder and create a folder named database.ini
-Copy and paste the following values with your PostgresSQL db info
+Change the directory to the project folder "Flask_User_Registration_API-main"
+Make a copy of .env.example file and rename it to be
 ```
-[postgresql]
-host=
-database=
-user=
-password=
+.env
 ```
-Create and activate virtualenv
+open .env file and add your twilio api keys to it and choose the environment you want to run your application as (production, deveolpment, testing)
+Change directory to src/database
+Make copy of database.ini.example and name it to be
+```
+database.ini
+```
+open the database.ini and fill in your postgres database and host information
+
+Go back to main project folder and create and activate virtualenv
 ```
 python -m virtualenv venv
 .\venv\Scripts\activate.bat
@@ -34,35 +35,42 @@ You're ready to go!
 
 
 ### Usage
-Open the project folder and execute the following command
+Open the base project folder and execute the following command
 ```
-python src/app.py
+python -m app
 ```
-go to http://127.0.0.1:5000/
+Now you can make calls to the API
 
-### API
+### API Usage
 To register a new user send a post request to
 ```
 /users
 ```
-Build your post request inclduing following values in the json response body
+Build your post request inclduing following values as multipart/form-data content-type
 ```
-{
-    "data": {
-        "id": user_id,
-        "email": email,
-        "username": username,
-        "name": name,
-        "phone": phone
-    }
-}
+"id": <user_id>,
+"email": <email>,
+"username": <username>,
+"name": <first and last name>,
+"phone": <phone>,
+"password": <password>,
+"confirm_password": <password confirmation>
 ```
-It will return the userdata with the user_id that the db assigned
+It will return the user_id that the db assigned to the new user if successful
 
-To get user data using the user id send a GET request
+To get luser data from the database use the user id to send a GET request as follows
 ```
 /users/<user id>
 ```
-
+It will return a json message including the user details:
+```
+{
+    "id": <user_id>,
+    "email": <email>,
+    "username": <username>,
+    "name": <first and last name>,
+    "phone": <phone>
+}
+```
 
 
