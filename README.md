@@ -74,6 +74,6 @@ It will return a json message including the user details:
 }
 ```
 ### Validation
-### Errors  
+### Errors
 
 
