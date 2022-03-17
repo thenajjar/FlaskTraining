@@ -2,6 +2,7 @@ from src.database.users import create_user, get_user
 from src.twilio.verify import send_otp_sms, verify_otp_sms
 from src.swagger.swagger_schemas import *
 from src.wtforms.wtforms_templates import *
+from src.config.config import app_configs
 
 from flask import request, Response, json
 from flask_restful import Resource
@@ -15,24 +16,24 @@ def error_response(http_response_code, error_code, error_description, error_payl
     and an optional error payload, and returns these values in a json formatted response    
     """
 
-    if error_payload:
-        return Response(
-            response=json.dumps({
-                "error_code": str(error_code),
-                "error_description": str(error_description),
-                "error_payload": str(error_payload)
-            }),
-            status=int(http_response_code)
-        )
-    else:
-        return Response(
-            response=json.dumps({
-                "error_code": str(error_code),
-                "error_description": str(error_description)
-            }),
-            status=int(http_response_code)
+    if app_configs.get("ERROR_PAYLOAD"):
+        if error_payload:
+            return Response(
+                response=json.dumps({
+                    "error_code": str(error_code),
+                    "error_description": str(error_description),
+                    "error_payload": str(error_payload)
+                }),
+                status=int(http_response_code)
+            )
+    return Response(
+        response=json.dumps({
+            "error_code": str(error_code),
+            "error_description": str(error_description)
+        }),
+        status=int(http_response_code)
 
-        )
+    )
 
 
 def password_match(main_password, confirm_password, message=None):
@@ -42,7 +43,7 @@ def password_match(main_password, confirm_password, message=None):
     if not message:
         message = 'Passwords are not matching.'
     if main_password != confirm_password:
-        raise Exception(message)
+        raise Exception("409", "CONFLICT", message, "")
 
 
 class users_api(MethodResource, Resource):
@@ -73,9 +74,12 @@ class users_api(MethodResource, Resource):
         confirm_password = request.form['confirm_password']
         try:
             password_match(password, confirm_password)
-        except Exception as error_message:
-            return error_response(409, "CONFLICT", error_message)
-        user_id = create_user(name, username, email, phone, password)
+        except Exception as error:
+            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
+        try:
+            user_id = create_user(name, username, email, phone, password)
+        except Exception as error:
+            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         # otp_status = send_otp_sms(phone)
         otp_status = "hello"
         if otp_status:
@@ -109,8 +113,8 @@ class users_api_get(MethodResource, Resource):
         """
         try:
             _, name, username, email, _, phone = get_user(user_id)
-        except Exception as error_message:
-            return error_response(404, "NOT_FOUND", error_message)
+        except Exception as error:
+            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         return Response(
             response=json.dumps({
                 "data": {
@@ -146,13 +150,16 @@ class verify_api(MethodResource, Resource):
         errors = otp_form.errors
         for field, error_messages in errors.items():
             return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
-        user_id = int(request.form['user_id'])
-        otp = str(request.form['otp'])
+        user_id = request.form['user_id']
+        otp = request.form['otp']
         try:
             _, name, username, email, _, phone = get_user(user_id)
-        except Exception as error_message:
-            return error_response(404, "NOT_FOUND", error_message)
-        verify_status = verify_otp_sms(phone, otp)
+        except Exception as error:
+            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
+        try:
+            verify_status = verify_otp_sms(phone, otp)
+        except Exception as error:
+            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         if verify_status:
             return Response(
                 response=json.dumps({

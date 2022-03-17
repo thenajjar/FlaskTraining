@@ -27,7 +27,7 @@ def create_table():
         # commit the changes
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        raise Exception(error)
+        return Exception(["Failed to create database", error])
     finally:
         if conn is not None:
             conn.close()
@@ -56,8 +56,8 @@ def create_user(new_name, new_username, new_email, new_phone, new_password):
         conn.commit()
         # close communication with the database
         cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        raise Exception(error)
+    except (Exception, psycopg2.DatabaseError) as error_message:
+        raise Exception("500", "SERVER_FAILURE", "Database failed to create new user.", error_message)
     finally:
         if conn is not None:
             conn.close()
@@ -85,10 +85,9 @@ def get_user(user_id):
         if value:
             return value
         else:
-            error_message = "User is not found"
-            raise Exception(error_message)
+            raise Exception("404", "SERVER_FAILURE", "User is not found.", "")
     except (Exception, psycopg2.DatabaseError) as error_message:
-        raise Exception(error_message)
+        raise Exception("500" , "SERVER_FAILURE", "Failed to get user data from database.", error_message)
     finally:
         if conn is not None:
             conn.close()
@@ -114,7 +113,7 @@ def db_value_exists(key, value):
         if result:
             return True
     except (Exception, psycopg2.DatabaseError) as error_message:
-        raise Exception(error_message)
+        raise Exception("500", "SERVER_FAILURE", "Server failed to connect to database." ,error_message)
     finally:
         if conn is not None:
             conn.close()

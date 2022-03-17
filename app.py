@@ -1,6 +1,6 @@
 # from src.database_module.users import create_table
 from src.routes.flask_routes import *
-from src.config.flask_config import *
+from src.config.config import app_configs
 
 from flask import Flask
 from flask_restful import Api
@@ -10,18 +10,13 @@ from flask_apispec.extension import FlaskApiSpec
 import jwt
 import sys
 
+
 # define flask app
 app = Flask(__name__, template_folder='templates')
 # define the restful api
 api = Api(app)
-# production configs for flask
-pcfg = FlaskProductionConfig.configs
-# developmenet configs for flask
-dcfg = FlaskDevelopmentConfig.configs
-# testing configs for flask
-tcfg = FlaskTestingConfig.configs
 # update the flask app to the selected config
-app.config.update(dcfg)
+app.config.update(app_configs.settings['flask'])
 # generate swagger documentation
 docs = FlaskApiSpec(app)
 
