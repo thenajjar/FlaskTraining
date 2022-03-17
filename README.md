@@ -41,7 +41,8 @@ python -m app
 ```
 Now you can make calls to the API
 
-### API Usage
+# API
+### Usage
 To register a new user send a post request to
 ```
 /users
@@ -72,5 +73,7 @@ It will return a json message including the user details:
     "phone": <phone>
 }
 ```
+### Validation
+### Errors
 
 
