@@ -61,6 +61,7 @@ class users_api(MethodResource, Resource):
             return error_response(409, "SYNTAX", "Missing request body",
                                   "Please include multipart/form-data body")
         user_form = RegisterNewUserForm()
+        user_form.validate_on_submit()
         errors = user_form.errors
         for field, error_messages in errors.items():
             return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
@@ -141,6 +142,7 @@ class verify_api(MethodResource, Resource):
             return error_response(409, "SYNTAX", "Missing request body",
                                   "Please include multipart/form-data body")
         otp_form = OTPVerifyForm()
+        otp_form.validate_on_submit()
         errors = otp_form.errors
         for field, error_messages in errors.items():
             return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))

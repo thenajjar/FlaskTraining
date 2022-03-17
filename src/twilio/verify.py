@@ -17,10 +17,9 @@ def send_otp_sms(phone):
             .services(app_token) \
             .verifications \
             .create(to=phone, channel='sms')
-        print(verification.sid)
         return(verification.sid)
     except Exception as error_message:
-        print(error_message)
+        raise Exception(error_message)
 
 
 def verify_otp_sms(phone, code):
@@ -32,4 +31,4 @@ def verify_otp_sms(phone, code):
         if verification_check.status == "approved":
             return True
     except Exception as error_message:
-        print(error_message)
+        raise Exception(error_message)

@@ -27,7 +27,7 @@ def create_table():
         # commit the changes
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        raise Exception(error)
     finally:
         if conn is not None:
             conn.close()
@@ -106,13 +106,11 @@ def db_value_exists(key, value):
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        print(value)
         cur.execute(sql, (value,))
         # get the generated id back
         result = cur.fetchall()
         # close communication with the database
         cur.close()
-        print(result)
         if result:
             return True
     except (Exception, psycopg2.DatabaseError) as error_message:

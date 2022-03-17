@@ -1,11 +1,10 @@
 # from src.database_module.users import create_table
 from src.routes.flask_routes import *
+from src.config.flask_config import *
 
 from flask import Flask
 from flask_restful import Api
 
-from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 
 import jwt
@@ -15,24 +14,14 @@ import sys
 app = Flask(__name__, template_folder='templates')
 # define the restful api
 api = Api(app)
-# set testing enviroment
-app.config['TESTING'] = True
-
-app.config.update({
-    # settings for swagger
-    'APISPEC_SPEC': APISpec(
-        title='Awesome Project',
-        version='v1',
-        plugins=[MarshmallowPlugin()],
-        openapi_version='2.0.0'
-    ),
-    'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON
-    'APISPEC_SWAGGER_UI_URL': '/swagger-ui/',  # URI to access UI of API Doc
-    'SECRET_KEY': "test",
-    # CSRF key for wtforms
-    'WTF_CSRF_SECRET_KEY': "test123"
-})
-
+# production configs for flask
+pcfg = FlaskProductionConfig.configs
+# developmenet configs for flask
+dcfg = FlaskDevelopmentConfig.configs
+# testing configs for flask
+tcfg = FlaskTestingConfig.configs
+# update the flask app to the selected config
+app.config.update(dcfg)
 # generate swagger documentation
 docs = FlaskApiSpec(app)
 
@@ -48,7 +37,7 @@ def main(args=None):
     if args:
         print(type(args))
     # create_table()
-    app.run(debug=True)
+    app.run()
 
 
 if __name__ == "__main__":

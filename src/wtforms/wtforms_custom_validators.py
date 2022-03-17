@@ -11,7 +11,6 @@ class unique_value(object):
         self.message = message
 
     def __call__(self, form, field):
-        print("called")
         field_id = field.id
         if not self.message:
             self.message = 'The {} already exists'.format(field_id)
