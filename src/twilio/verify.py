@@ -1,12 +1,10 @@
+from src.dotenv.load import get_var
+
 from twilio.rest import Client
-from dotenv import load_dotenv, find_dotenv
-from os import getenv
 
-load_dotenv(find_dotenv())
-
-account_sid = getenv('TWILIO_ACCOUNT_SID')
-auth_token = getenv('TWILIO_AUTH_TOKEN')
-app_token = getenv('TWILIO_VERIFY_APP_TOKEN')
+account_sid = get_var('TWILIO_ACCOUNT_SID')
+auth_token = get_var('TWILIO_AUTH_TOKEN')
+app_token = get_var('TWILIO_VERIFY_APP_TOKEN')
 
 client = Client(account_sid, auth_token)
 

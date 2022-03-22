@@ -15,11 +15,13 @@ class RegisterNewUserForm(FlaskForm):
     email = StringField('email', validators=[DataRequired(
         message="email is requiered"), Email(message="Wrong Email formatting"), unique_value()])
     phone = StringField('phone', validators=[DataRequired(
-        message="phone is requiered"), unique_value()])
+        message="phone is requiered")])
     password = StringField('password', validators=[DataRequired(
         message="password is requiered"), password_format()])
     confirm_password = StringField('confirm_password', validators=[
                                    DataRequired(message="password is requiered")])
+    role = StringField('role', validators=[
+                                   DataRequired(message="password is requiered"), is_role()])
 
 
 class GetUserDataForm(FlaskForm):
@@ -33,3 +35,10 @@ class OTPVerifyForm(FlaskForm):
         csrf = False
     user_id = StringField('user_id', validators=[DataRequired()])
     otp = StringField('otp', validators=[DataRequired()])
+
+
+class LoginForm(FlaskForm):
+    class Meta:
+        csrf = False
+    username = StringField('username', validators=[DataRequired(), exists()])
+    password = StringField('password', validators=[DataRequired()])

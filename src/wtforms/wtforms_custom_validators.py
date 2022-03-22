@@ -29,7 +29,7 @@ class exists(object):
     def __call__(self, form, field):
         field_id = field.id
         if not self.message:
-            self.message = 'The {} already exists'.format(field_id)
+            self.message = 'The {} does not exists'.format(field_id)
         if not users_db.exists(field_id, field.data):
             raise ValidationError(self.message)
 
@@ -72,4 +72,20 @@ class password_format(object):
             error = True
 
         if error:
+            raise ValidationError(self.message)
+
+
+class is_role(object):
+    """WTform validation object that takes a wtform field value and raises error if the field value exists 
+    in a column, identfied by the wtform field id, in the users table in the flask database
+    """
+
+    def __init__(self, message=None):
+        self.message = message
+
+    def __call__(self, form, field):
+        field_id = field.id
+        if not self.message:
+            self.message = 'The role {} is not valid.'.format(field_id)
+        if str(field.data).lower() not in ["user", "admin"]:
             raise ValidationError(self.message)

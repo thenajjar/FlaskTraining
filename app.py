@@ -23,6 +23,7 @@ docs = FlaskApiSpec(app)
 api.add_resource(users_api, '/users')
 api.add_resource(users_api_get, '/users/<string:user_id>')
 api.add_resource(verify_api, '/verify')
+api.add_resource(login_api, '/login')
 
 # register swagger docs to each api resouce
 docs.register(users_api)

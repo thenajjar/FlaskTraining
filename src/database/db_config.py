@@ -2,7 +2,7 @@ from configparser import ConfigParser
 
 
 def db_config(filename='src\\database\\database.ini', section='postgresql'):
-    """_summary_
+    """checks the postgres settings and returns it as dictionary
 
     Args:
         filename (str, optional): File that stores database settings. Defaults to 'src\database\database.ini'.

@@ -1,12 +1,8 @@
-from pickletools import read_uint1
 from src.config.flask_config import *
 from src.config.app_config import *
+from src.dotenv.load import get_var
 
-from dotenv import load_dotenv, find_dotenv
-from os import getenv
 
-# Load the enviornment variables
-load_dotenv(find_dotenv())
 
 
 class configurations(object):
@@ -53,5 +49,5 @@ class configurations(object):
         return value
 
 
-config_env = getenv('APP_ENV')
+config_env = get_var('APP_ENV')
 app_configs = configurations(config_env)

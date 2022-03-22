@@ -3,3 +3,7 @@
 .vscode
 **/database.ini
 **/__pycache__
+html
+docker-compose.debug.yml
+docker-compose.yml
+Dockerfile
