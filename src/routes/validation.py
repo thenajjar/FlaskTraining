@@ -2,6 +2,7 @@ from flask import request
 
 from src.database.users import users_db
 from src.errors.errors_fun import error_response
+from secrets import compare_digest
 
 
 def valid_request_type(types):
@@ -13,17 +14,15 @@ def valid_request_type(types):
 
     def inner(fun):
         def wrapper(*args, **kwargs):
+            # extract the request content-type from a request
             try:
-                # extract the request content-type from a request
-                request_content_type = request.headers['content-type'].split(";")[
-                    0]
-                if request_content_type not in types:
-                    return error_response(409, "SYNTAX", "Unacceptable content-type",
-                                          "Please only use multipart/form-data content-type")
-                return fun(*args, **kwargs)
+                request_content_type = request.headers['content-type'].split(";")[0]
             except:
-                return error_response(409, "SYNTAX", "Missing request body",
-                                      "Please include multipart/form-data body")
+                return error_response(409, "SYNTAX", "Missing request body", "Please include multipart/form-data body")
+            if request_content_type not in types:
+                return error_response(409, "SYNTAX", "Unacceptable content-type",
+                                      "Please only use multipart/form-data content-type")
+            return fun(*args, **kwargs)
 
         return wrapper
 
@@ -43,7 +42,7 @@ def valid_user(username, password):
     try:
         user_id = users_db.get_id('username', username)
         _, _, _, _, db_password, *_ = users_db.get_user(user_id)
-        if password == db_password:
+        if compare_digest(password, db_password):
             return True
         else:
             raise Exception("403", "UNAUTHORIZED",
@@ -74,9 +73,8 @@ def valid_wtform(form):
                                           error_messages[0].replace("Field", field).replace("This field",
                                                                                             field + " field"))
                 return fun(*args, **kwargs)
-            except:
-                return error_response(409, "SYNTAX", "Missing request body",
-                                      "Please include multipart/form-data body")
+            except Exception as error:
+                return error_response(409, "SYNTAX", "Invalid form fields", error)
 
         return wrapper
 
@@ -99,5 +97,5 @@ def password_match(main_password, confirm_password, message=None):
     if not message:
         message = 'Passwords are not matching.'
     # check if passwords are not matching
-    if main_password != confirm_password:
+    if not compare_digest(main_password, confirm_password):
         raise Exception("409", "CONFLICT", message, "")

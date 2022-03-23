@@ -19,7 +19,7 @@ class UsersApi(MethodResource, Resource):
     @valid_request_type(types=("multipart/form-data",))
     @valid_wtform(form=RegisterNewUserForm)
     @doc(description='Register a new user', tags=['Register'])
-    @use_kwargs(RegisterUserRequestSchema, location=('json',))
+    @use_kwargs(RegisterUserRequestSchema, location=('json'))
     @marshal_with(RegisterUserResponseSchema)
     def post(self):
         """Takes a request containing users details, and creates new user 
@@ -73,7 +73,7 @@ class UsersApi(MethodResource, Resource):
 class UsersApiGet(MethodResource, Resource):
     @valid_jwt
     @doc(description='Get all the users details', tags=['Users'])
-    @use_kwargs(GetUserRequestSchema, location=('json',))
+    @use_kwargs(GetUserRequestSchema, location=('json'))
     @marshal_with(GetUserResponseSchema)
     def get(self, user_id):
         """ Takes a user_id from a request and returns the data of that 
@@ -115,7 +115,7 @@ class VerifyApi(MethodResource, Resource):
     @valid_wtform(form=OTPVerifyForm)
     @valid_jwt
     @doc(description='Verify the OTP code to register new users', tags=['Register'])
-    @use_kwargs(OTPRequestSchema, location=('json',))
+    @use_kwargs(OTPRequestSchema, location=('json'))
     @marshal_with(OTPResponseSchema)
     def post(self):
         """Take a user_id and OTP from the request, and validates if the OTP code is correct
