@@ -22,7 +22,9 @@ class FlaskProductionConfig(object):
         'APISPEC_SWAGGER_UI_URL': '/docs/',  # URI to access UI of API Doc
         'SECRET_KEY': "test",
         # CSRF key for wtforms
-        'WTF_CSRF_SECRET_KEY': "production_key"
+        'WTF_CSRF_SECRET_KEY': "production_key",
+        'CELERY_BROKER_URL': 'redis://localhost:6379',
+        'RESULT_BACKEND': 'redis://localhost:6379'
     }
     
 class FlaskDevelopmentConfig(object):
@@ -46,7 +48,9 @@ class FlaskDevelopmentConfig(object):
         'APISPEC_SWAGGER_UI_URL': '/docs/',  # URI to access UI of API Doc
         'SECRET_KEY': "test",
         # CSRF key for wtforms
-        'WTF_CSRF_SECRET_KEY': "development_key"
+        'WTF_CSRF_SECRET_KEY': "development_key",
+        'CELERY_BROKER_URL': 'redis://localhost:6379',
+        'RESULT_BACKEND': 'redis://localhost:6379'
     }
     
 class FlaskTestingConfig(object):
@@ -70,5 +74,7 @@ class FlaskTestingConfig(object):
         'APISPEC_SWAGGER_UI_URL': '/docs/',  # URI to access UI of API Doc
         'SECRET_KEY': "test",
         # CSRF key for wtforms
-        'WTF_CSRF_SECRET_KEY': "testing_key"
+        'WTF_CSRF_SECRET_KEY': "testing_key",
+        'CELERY_BROKER_URL': 'redis://localhost:6379',
+        'RESULT_BACKEND': 'redis://localhost:6379',
     }

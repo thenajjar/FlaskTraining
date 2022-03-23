@@ -25,7 +25,6 @@ def tokenize(payload_data, exp_time=None):
         payload_data = json.loads(payload_data)
     # convert the payload_data json and the secret into jwt token string
     exp_timestamp = int(datetime.datetime.fromisoformat(str(datetime.datetime.utcnow() + datetime.timedelta(minutes=int(exp_time)))).timestamp())
-    print(exp_timestamp)
     payload_data.update({"exp": exp_timestamp})
     token = jwt.encode(
         payload=payload_data,
@@ -45,7 +44,6 @@ def decode_token(token):
         str: a JWT token of the payload and secret
     """
     secret = get_var('JWT_SECRET')
-    # print(token['exp'])
     # make sure the type is json, and if it's string convert it to json
     try:
         payload = jwt.decode(jwt=str(token), key=str(secret), algorithms=["HS256",])

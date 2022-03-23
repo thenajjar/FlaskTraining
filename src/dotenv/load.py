@@ -16,5 +16,6 @@ def get_var(var):
     try:
         # Load the variable from the system enviroments .env file
         var = getenv(str(var))
+        return var
     except:
         raise SystemExit("Could not find the variable: "+var+" inside environment variables file.")

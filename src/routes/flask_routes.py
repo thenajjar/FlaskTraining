@@ -1,5 +1,5 @@
+from urllib import response
 from src.database.users import users_db
-from src.twilio.verify import send_otp_sms, verify_otp_sms
 from src.swagger.swagger_schemas import *
 from src.wtforms.wtforms_templates import *
 from src.errors.errors_fun import error_response
@@ -48,22 +48,25 @@ class users_api(MethodResource, Resource):
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         # send an otp message to the user
-        # otp_status = send_otp_sms(phone)
-        otp_status = "hello"
+        print("sending otp")
+        from src.twilio.otp import send_otp_sms_call
+        send_otp_sms_call(phone)
+        print("sent otp")
         # the reponse body to send in flask response
         payload = json.dumps({
             "user_id": user_id,
+            "username": username
         })
+        token = tokenize({'user_id': int(user_id)})
         # if an otp message was sent successfuly
-        if otp_status:
-            return Response(
-                response=payload,
-                status=201,
-                # the response body content type
-                mimetype="application/json"
-            )
-        else:
-            return error_response("409", "CONFLICT", "OTP status error.", otp_status)
+        response = Response(
+            response=payload,
+            status=201,
+            # the response body content type
+            mimetype="application/json"
+        )
+        response.headers['Authorization'] = "Bearer " + token
+        return response
 
 
 class users_api_get(MethodResource, Resource):
@@ -81,13 +84,12 @@ class users_api_get(MethodResource, Resource):
         try:
             jwt_token = request.headers['authorization'].split(" ")[1]
             request_user_id = decode_token(jwt_token)['user_id']
-            if int(user_id) != int(request_user_id):
-                if users_db.get_role('user_id', request_user_id) != 'admin':
-                    return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
+            if int(user_id) != int(request_user_id) and users_db.get_role('user_id', request_user_id) != 'admin':
+                return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         try:
-            _, name, username, email, _, phone, role = users_db.get_user(
+            _, name, username, email, _, phone, *_ = users_db.get_user(
                 user_id)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
@@ -96,8 +98,7 @@ class users_api_get(MethodResource, Resource):
             "email": email,
             "username": username,
             "name": name,
-            "phone": phone,
-            "role": role
+            "phone": phone
         })
         response = Response(
             response=payload,
@@ -128,6 +129,7 @@ class verify_api(MethodResource, Resource):
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         try:
+            from src.twilio.otp import verify_otp_sms
             verify_status = verify_otp_sms(phone, otp)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
@@ -164,11 +166,12 @@ class login_api(MethodResource, Resource):
             valid_user(username, password)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
-        payload = json.dumps({
-            "username": username
-        })
         user_id = users_db.get_id('username', username)
         token = tokenize({'user_id': int(user_id)})
+        payload = json.dumps({
+            "username": username,
+            "user_id": user_id  
+        })
         response = Response(
             response=payload,
             status=200,
