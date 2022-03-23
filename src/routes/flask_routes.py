@@ -3,7 +3,7 @@ from src.twilio.verify import send_otp_sms, verify_otp_sms
 from src.swagger.swagger_schemas import *
 from src.wtforms.wtforms_templates import *
 from src.errors.errors_fun import error_response
-from src.routes.validation import valid_request_type, valid_user
+from src.routes.validation import valid_request_type, valid_user, valid_wtform, password_match
 
 from src.hashlib.encryption import encrypt
 from src.jwt.tokens import tokenize, valid_jwt, decode_token
@@ -14,27 +14,9 @@ from flask_apispec import marshal_with, doc, use_kwargs
 from flask_apispec.views import MethodResource
 
 
-def password_match(main_password, confirm_password, message=None):
-    """Takes main password and a password to compare it with, and raises an error if 
-    the passwords are not matching.
-
-    Args:
-        main_password (str): the main password
-        confirm_password (str): the confirmation password to compare
-
-    Raises:
-        Exception: passwords values are not matching
-    """
-    # default message if message is not set
-    if not message:
-        message = 'Passwords are not matching.'
-    # check if passwords are not matching
-    if main_password != confirm_password:
-        raise Exception("409", "CONFLICT", message, "")
-
-
 class users_api(MethodResource, Resource):
     @valid_request_type(types=("multipart/form-data",))
+    @valid_wtform(form=RegisterNewUserForm)
     @doc(description='Register a new user', tags=['Register'])
     @use_kwargs(RegisterUserRequestSchema, location=('json'))
     @marshal_with(RegisterUserResponseSchema)
@@ -46,15 +28,6 @@ class users_api(MethodResource, Resource):
             class: flask response class containin guser_id as response body
         """
         # a wtform template for regisertering new users with data validation
-        user_form = RegisterNewUserForm()
-        # validate the form data
-        user_form.validate_on_submit()
-        # catch any data validation errors
-        errors = user_form.errors
-        # loop through the errors if any
-        for field, error_messages in errors.items():
-            # return first error as a response
-            return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
         username = request.form['username']
         name = request.form['name']
         email = request.form['email']
@@ -62,7 +35,7 @@ class users_api(MethodResource, Resource):
         # one way encryption for the passwords to store them
         password = encrypt(request.form['password'])
         confirm_password = encrypt(request.form['confirm_password'])
-        role = str(request.form['role']).lower()
+        role = "user"
         # make sure the passwords are matching
         try:
             password_match(password, confirm_password)
@@ -114,7 +87,8 @@ class users_api_get(MethodResource, Resource):
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         try:
-            _, name, username, email, _, phone, role = users_db.get_user(user_id)
+            _, name, username, email, _, phone, role = users_db.get_user(
+                user_id)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         payload = json.dumps({
@@ -136,21 +110,17 @@ class users_api_get(MethodResource, Resource):
 
 class verify_api(MethodResource, Resource):
     @valid_request_type(types=("multipart/form-data",))
+    @valid_wtform(form=OTPVerifyForm)
     @valid_jwt
     @doc(description='Verify the OTP code to register new users', tags=['Register'])
     @use_kwargs(OTPRequestSchema, location=('json'))
     @marshal_with(OTPResponseSchema)
     def post(self):
-        """Take a userid and OTP from the request, and validates if the OTP 
+        """Take a userid and OTP from the request, and validates if the OTP code is correct
 
         Returns:
-            _type_: flask response class containing user data
+            class: flask response class containing user data
         """
-        otp_form = OTPVerifyForm()
-        otp_form.validate_on_submit()
-        errors = otp_form.errors
-        for field, error_messages in errors.items():
-            return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
         user_id = request.form['user_id']
         otp = request.form['otp']
         try:
@@ -180,12 +150,14 @@ class verify_api(MethodResource, Resource):
 
 class login_api(MethodResource, Resource):
     @valid_request_type(types=("multipart/form-data",))
+    @valid_wtform(form=LoginForm)
     def post(self):
-        login_form = LoginForm()
-        login_form.validate_on_submit()
-        errors = login_form.errors
-        for field, error_messages in errors.items():
-            return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
+        """authenticate the user credintials using username and password and sends a 
+        jwt token in response header
+
+        Returns:
+            class: flask response class containing jwt token if the user is authorized
+        """
         username = request.form['username']
         password = encrypt(request.form['password'])
         try:
@@ -193,8 +165,8 @@ class login_api(MethodResource, Resource):
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         payload = json.dumps({
-                    "username": username
-                })
+            "username": username
+        })
         user_id = users_db.get_id('username', username)
         token = tokenize({'user_id': int(user_id)})
         response = Response(

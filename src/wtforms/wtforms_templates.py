@@ -20,8 +20,6 @@ class RegisterNewUserForm(FlaskForm):
         message="password is requiered"), password_format()])
     confirm_password = StringField('confirm_password', validators=[
                                    DataRequired(message="password is requiered")])
-    role = StringField('role', validators=[
-                                   DataRequired(message="password is requiered"), is_role()])
 
 
 class GetUserDataForm(FlaskForm):
