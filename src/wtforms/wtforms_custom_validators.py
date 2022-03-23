@@ -1,10 +1,11 @@
 from wtforms.validators import ValidationError
+
 from src.database.users import users_db
 
 
-class unique_value(object):
+class UniqueValue(object):
     """WTform validation object that takes a wtform field value and raises error if the field value exists 
-    in a column, identfied by the wtform field id, in the users table in the flask database
+    in a column, identified by the wtform field id, in the users' table in the flask database
     """
 
     def __init__(self, message=None):
@@ -18,9 +19,9 @@ class unique_value(object):
             raise ValidationError(self.message)
 
 
-class exists(object):
-    """WTform validation object that takes a wtform field value and raises error if the field value does not exists 
-    in a column, identfied by the wtform field id, in the users table in the flask database
+class ValueExists(object):
+    """WTform validation object that takes a wtform field value and raises error if the field value does not exist
+    in a column, identified by the wtform field id, in the users' table in the flask database
     """
 
     def __init__(self, message=None):
@@ -34,9 +35,9 @@ class exists(object):
             raise ValidationError(self.message)
 
 
-class password_format(object):
+class PasswordFormat(object):
     """WTform validation object that takes a wtform field value and raises an error if the value does not fulfill
-    password requirments of containting a symbol @#!$&, cap letter, small letter, and a number
+    password requirements of containing a symbol @#!$&, cap letter, small letter, and a number
     """
 
     def __init__(self, message=None):
@@ -75,9 +76,8 @@ class password_format(object):
             raise ValidationError(self.message)
 
 
-class is_role(object):
-    """WTform validation object that takes a wtform field value and raises error if the field value exists 
-    in a column, identfied by the wtform field id, in the users table in the flask database
+class IsRole(object):
+    """WTform validation object that takes a wtform field value and raises error if the field value is not a valid role
     """
 
     def __init__(self, message=None):

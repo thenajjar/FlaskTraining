@@ -1,5 +1,7 @@
-from src.config.config import app_configs
 from flask import Response, json
+
+from src.config.config import app_configs
+
 
 def error_response(http_response_code, error_code, error_description, error_payload=""):
     """Takes http response code, and error code string and description to that error code, 
@@ -9,7 +11,7 @@ def error_response(http_response_code, error_code, error_description, error_payl
         http_response_code (int, str): the http response code
         error_code (str): the error type
         error_description (str): description about the error
-        error_payload (str) optional: additonal information about the rror
+        error_payload (str) optional: additional information about the error
 
     Returns:
         class: a flask response class

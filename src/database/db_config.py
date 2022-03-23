@@ -5,15 +5,15 @@ def db_config(filename='src\\database\\database.ini', section='postgresql'):
     """checks the postgres settings and returns it as dictionary
 
     Args:
-        filename (str, optional): File that stores database settings. Defaults to 'src\database\database.ini'.
-        section (str, optional): Specify section that stores the data in the congig file. Defaults to 'postgresql'.
+        filename (str, optional): File that stores database settings. Defaults to 'src\\database\\database.ini'.
+        section (str, optional): Specify section that stores the data in the config file. Defaults to 'postgresql'.
 
     Raises:
         Exception: if section is not found in the configuration file
 
     Returns:
         dictionary: database settings
-    """    
+    """
     # create a parser
     parser = ConfigParser()
     # read config file

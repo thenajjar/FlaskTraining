@@ -1,17 +1,15 @@
-from src.config.flask_config import *
-from src.config.app_config import *
+from src.config.app_config import AppProductionConfig, AppDevelopmentConfig, AppTestingConfig
+from src.config.flask_config import FlaskProductionConfig, FlaskDevelopmentConfig, FlaskTestingConfig
 from src.dotenv.load import get_var
 
 
-
-
-class configurations(object):
+class Configurations(object):
     """Class to store application settings in a dictionary called settings
     """
 
     def __init__(self, env=None):
         if not env:
-            # define environment as deveolopment if user didn't specify an env
+            # define environment as development if user didn't specify an env
             env = 'd'
         # default flask configuration to development env
         flask_conf = FlaskDevelopmentConfig.configs
@@ -50,4 +48,4 @@ class configurations(object):
 
 
 config_env = get_var('APP_ENV')
-app_configs = configurations(config_env)
+app_configs = Configurations(config_env)

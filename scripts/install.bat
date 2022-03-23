@@ -1,5 +1,5 @@
 @echo
-:: install requirments
+:: install requirements
 pip install -r requirements.txt
 
 pause

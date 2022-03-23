@@ -1,18 +1,20 @@
-from src.errors.errors_fun import error_response
-from src.database.users import users_db
 from flask import request
+
+from src.database.users import users_db
+from src.errors.errors_fun import error_response
 
 
 def valid_request_type(types):
-    """Check if content type of a flask response of an inner function is valid type.
+    """Check if content type of flask response of an inner function is valid type.
 
     Args:
         types (tuple): a tuple that includes all acceptable content types
     """
+
     def inner(fun):
         def wrapper(*args, **kwargs):
             try:
-                # exctract the request content-type from a request
+                # extract the request content-type from a request
                 request_content_type = request.headers['content-type'].split(";")[
                     0]
                 if request_content_type not in types:
@@ -22,7 +24,9 @@ def valid_request_type(types):
             except:
                 return error_response(409, "SYNTAX", "Missing request body",
                                       "Please include multipart/form-data body")
+
         return wrapper
+
     return inner
 
 
@@ -30,10 +34,11 @@ def valid_user(username, password):
     """validate username and password and make sure they belong to the same user
 
     Args:
-        types (tuple): a tuple that includes all acceptable content types
+        username (str): the username to compare with password
+        password (str): the password to compare with username
 
     Returns:
-        True (boolen): if password matches the user password in the db
+        True (boolean): if password matches the username's password in the db
     """
     try:
         user_id = users_db.get_id('username', username)
@@ -54,23 +59,27 @@ def valid_wtform(form):
     Args:
         form(class): wtform template
     """
+
     def inner(fun):
         def wrapper(*args, **kwargs):
             try:
-                # exctract the request content-type from a request
-                # jtforms for OTP request
+                # wtforms
                 new_form = form()
-                # validate the request form fields
+                # validate the wtform fields
                 new_form.validate_on_submit()
                 # make sure there are no errors
                 errors = new_form.errors
                 for field, error_messages in errors.items():
-                    return error_response(409, "CONFLICT", error_messages[0].replace("Field", field).replace("This field", field + " field"))
+                    return error_response(409, "CONFLICT",
+                                          error_messages[0].replace("Field", field).replace("This field",
+                                                                                            field + " field"))
                 return fun(*args, **kwargs)
             except:
                 return error_response(409, "SYNTAX", "Missing request body",
                                       "Please include multipart/form-data body")
+
         return wrapper
+
     return inner
 
 
@@ -81,6 +90,7 @@ def password_match(main_password, confirm_password, message=None):
     Args:
         main_password (str): the main password
         confirm_password (str): the confirmation password to compare
+        message (str) optional: optional error message, defaults to password not matching
 
     Raises:
         Exception: passwords values are not matching

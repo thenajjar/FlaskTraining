@@ -5,7 +5,7 @@ A project to train on REST API, PostgresSQL, Flask, Cron, Dockers
 ### Installation
 Create a local folder for your repo in your Windows OS
 Open CMD and change directory to your local repo folder
-Execute the follwing command in CMD to clone the repo
+Execute the following command in CMD to clone the repo
 ```
 git clone https://github.com/thenajjar/Flask_User_Registration_API.git
 ```
@@ -14,7 +14,7 @@ Make a copy of .env.example file and rename it to be
 ```
 .env
 ```
-open .env file and add your twilio api keys to it and choose the environment you want to run your application as (production, deveolpment, testing)
+open .env file and add your twilio api keys to it and choose the environment you want to run your application as (production, development, testing)
 Change directory to src/database
 Make copy of database.ini.example and name it to be
 ```
@@ -27,7 +27,7 @@ Go back to main project folder and create and activate virtualenv
 python -m virtualenv venv
 .\venv\Scripts\activate.bat
 ```
-install the requirments
+install the requirements
 ```
 pip install -r requirements.txt
 ```
@@ -47,7 +47,7 @@ To register a new user send a post request to
 ```
 /users
 ```
-Build your post request inclduing following values as multipart/form-data content-type
+Build your post request including the following values as multipart/form-data content-type
 ```
 "id": <user_id>,
 "email": <email>,
@@ -59,7 +59,7 @@ Build your post request inclduing following values as multipart/form-data conten
 ```
 It will return the user_id that the db assigned to the new user if successful
 
-To get luser data from the database use the user id to send a GET request as follows
+To get user data from the database use the user id to send a GET request as follows
 ```
 /users/<user id>
 ```

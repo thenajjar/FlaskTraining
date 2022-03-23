@@ -1,36 +1,39 @@
-from src.wtforms.wtforms_custom_validators import *
-
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Email, Length
+
+from src.wtforms.wtforms_custom_validators import UniqueValue, PasswordFormat, ValueExists
 
 
 class RegisterNewUserForm(FlaskForm):
     class Meta:
         csrf = False
+
     username = StringField('username', validators=[
-                           DataRequired(), Length(min=4, max=16), unique_value()])
+        DataRequired(), Length(min=4, max=16), UniqueValue()])
     name = StringField('name', validators=[
-                       DataRequired(message="name is requiered")])
+        DataRequired(message="name is required")])
     email = StringField('email', validators=[DataRequired(
-        message="email is requiered"), Email(message="Wrong Email formatting"), unique_value()])
+        message="email is required"), Email(message="Wrong Email formatting"), UniqueValue()])
     phone = StringField('phone', validators=[DataRequired(
-        message="phone is requiered")])
+        message="phone is required")])
     password = StringField('password', validators=[DataRequired(
-        message="password is requiered"), password_format()])
+        message="password is required"), PasswordFormat()])
     confirm_password = StringField('confirm_password', validators=[
-                                   DataRequired(message="password is requiered")])
+        DataRequired(message="password is required")])
 
 
 class GetUserDataForm(FlaskForm):
     class Meta:
         csrf = False
+
     user_id = StringField('user_id', validators=[DataRequired()])
 
 
 class OTPVerifyForm(FlaskForm):
     class Meta:
         csrf = False
+
     user_id = StringField('user_id', validators=[DataRequired()])
     otp = StringField('otp', validators=[DataRequired()])
 
@@ -38,5 +41,6 @@ class OTPVerifyForm(FlaskForm):
 class LoginForm(FlaskForm):
     class Meta:
         csrf = False
-    username = StringField('username', validators=[DataRequired(), exists()])
+
+    username = StringField('username', validators=[DataRequired(), ValueExists()])
     password = StringField('password', validators=[DataRequired()])
