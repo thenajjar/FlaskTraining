@@ -14,13 +14,7 @@ Make a copy of .env.example file and rename it to be
 ```
 .env
 ```
-open .env file and add your twilio api keys to it and choose the environment you want to run your application as (production, development, testing)
-Change directory to src/database
-Make copy of database.ini.example and name it to be
-```
-database.ini
-```
-open the database.ini and fill in your postgres database and host information
+open .env file and add your twilio api keys, postgres db settings, and redis cache settings to it and choose the environment you want to run your application as (production, development, testing)
 
 Go back to main project folder and create and activate virtualenv
 ```
@@ -33,23 +27,34 @@ pip install -r requirements.txt
 ```
 You're ready to go!
 
-
 ### Usage
-Open the base project folder and execute the following command
+Make sure you have a redis server running and Postgres
+Open the base project folder and execute the following commands
 ```
-python -m app
+.\Scripts\celery.bat
+.\Scripts\run.bat
 ```
 Now you can make calls to the API
 
+### Database setup
+If you don't have a database created yet, then go to project folder and make sure that the flask application is running as explained in Usage section.
+execute the following command
+```
+flask db init
+flask db migrate
+flask db upgrade
+```
+
 # API
 ### Usage
-To register a new user send a post request to
+####To register a new user
+send a post request to
 ```
 /users
 ```
 Build your post request including the following values as multipart/form-data content-type
 ```
-"id": <user_id>,
+"user_id": <user_id>,
 "email": <email>,
 "username": <username>,
 "name": <first and last name>,
@@ -57,9 +62,33 @@ Build your post request including the following values as multipart/form-data co
 "password": <password>,
 "confirm_password": <password confirmation>
 ```
-It will return the user_id that the db assigned to the new user if successful
+It will return the user_id that the db assigned to the new user if successful along with a jwt token in the authorization header of the request, and you will receive a sms OTP in your phone.
 
-To get user data from the database use the user id to send a GET request as follows
+####To verify the user after registration
+use the JWT token you recieved from creating a user along the OTP code and send a post request to
+```
+/verify
+```
+Build your post request including the following values as multipart/form-data content-type and include JWT token in authorization header
+```
+"user_id": <user_id>,
+"otp": <otp code>
+```
+
+####To login
+send post request to
+```
+/login
+```
+including the following values as multipart/form-data content-type
+```
+"username": <username>,
+"password": <the user password>
+```
+You will receive a JWT token in the response authorization header if successful
+
+####To get user data
+send a GET request as follows along with JWT token from regeisteration or login in the request authorization header
 ```
 /users/<user id>
 ```
