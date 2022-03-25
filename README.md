@@ -46,8 +46,7 @@ flask db upgrade
 ```
 
 # API
-### Usage
-####To register a new user
+### To register a new user
 send a post request to
 ```
 /users
@@ -64,7 +63,7 @@ Build your post request including the following values as multipart/form-data co
 ```
 It will return the user_id that the db assigned to the new user if successful along with a jwt token in the authorization header of the request, and you will receive a sms OTP in your phone.
 
-####To verify the user after registration
+### To verify the user after registration
 use the JWT token you recieved from creating a user along the OTP code and send a post request to
 ```
 /verify
@@ -75,7 +74,7 @@ Build your post request including the following values as multipart/form-data co
 "otp": <otp code>
 ```
 
-####To login
+### To login
 send post request to
 ```
 /login
@@ -87,7 +86,7 @@ including the following values as multipart/form-data content-type
 ```
 You will receive a JWT token in the response authorization header if successful
 
-####To get user data
+### To get user data
 send a GET request as follows along with JWT token from regeisteration or login in the request authorization header
 ```
 /users/<user id>
@@ -102,7 +101,4 @@ It will return a json message including the user details:
     "phone": <phone>
 }
 ```
-### Validation
-### Errors
-
 
