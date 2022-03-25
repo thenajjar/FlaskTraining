@@ -3,14 +3,16 @@ from flask_apispec import marshal_with, doc, use_kwargs
 from flask_apispec.views import MethodResource
 from flask_restful import Resource
 
-from src.database.users import users_db
-from src.errors.errors_fun import error_response
-from src.hashlib.encryption import encrypt
-from src.jwt.tokens import tokenize, valid_jwt, decode_token
+from src.sqlalchemyModule.db_connection import db
+from src.sqlalchemyModule.users import UsersDb
+from src.errorsModule.errors_fun import error_response
+from src.hashlibModule.encryption import encrypt
+from src.jwtModule.tokens import tokenize, valid_jwt, decode_token
 from src.routes.validation import valid_request_type, valid_user, valid_wtform, password_match
-from src.swagger.swagger_schemas import GetUserRequestSchema, GetUserResponseSchema, RegisterUserRequestSchema, \
+from src.swaggerModule.swagger_schemas import GetUserRequestSchema, GetUserResponseSchema, RegisterUserRequestSchema, \
     RegisterUserResponseSchema, OTPResponseSchema, OTPRequestSchema
-from src.wtforms.wtforms_templates import RegisterNewUserForm, OTPVerifyForm, LoginForm
+from src.wtformsModule.wtforms_templates import RegisterNewUserForm, OTPVerifyForm, LoginForm
+from src.twilioModule.otp import verify_otp_sms, send_otp_sms_call
 
 json_mime_type = "application/json"
 
@@ -44,15 +46,14 @@ class UsersApi(MethodResource, Resource):
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         # try to create a new user with the users details
         try:
-            user_id = users_db.create_user(
-                name, username, email, phone, password, role)
+            new_user = UsersDb(name=name, username=username, email=email, phone=phone, password=password, role=role)
+            db.session.add(new_user)
+            db.session.commit()
+            user_id = new_user.user_id
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
         # send an otp message to the user
-        print("sending otp")
-        from src.twilio.otp import send_otp_sms_call
         send_otp_sms_call(phone)
-        print("sent otp")
         # the response body to send in flask response
         payload = json.dumps({
             "user_id": user_id,
@@ -82,18 +83,20 @@ class UsersApiGet(MethodResource, Resource):
         Returns:
             class: flask response class containing user data
         """
+        user = UsersDb.query.get(user_id)
         try:
             jwt_token = request.headers['authorization'].split(" ")[1]
             request_user_id = decode_token(jwt_token)['user_id']
-            if int(user_id) != int(request_user_id) and users_db.get_role('user_id', request_user_id) != 'admin':
-                return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
+            request_user = UsersDb.query.get(request_user_id)
+            if int(user_id) != int(request_user.user_id):
+                if request_user.role != 'admin':
+                    return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
         except Exception as error:
-            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
-        try:
-            _, name, username, email, _, phone, *_ = users_db.get_user(
-                user_id)
-        except Exception as error:
-            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
+            return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', error.args[3])
+        name = user.name
+        email = user.email
+        username = user.username
+        phone = user.phone
         payload = json.dumps({
             "user_id": user_id,
             "email": email,
@@ -125,12 +128,12 @@ class VerifyApi(MethodResource, Resource):
         """
         user_id = request.form['user_id']
         otp = request.form['otp']
+        user = UsersDb.query.get(user_id)
+        name = user.name
+        email = user.email
+        username = user.username
+        phone = user.phone
         try:
-            _, name, username, email, _, phone, _ = users_db.get_user(user_id)
-        except Exception as error:
-            return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
-        try:
-            from src.twilio.otp import verify_otp_sms
             verify_status = verify_otp_sms(phone, otp)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
@@ -167,7 +170,8 @@ class LoginApi(MethodResource, Resource):
             valid_user(username, password)
         except Exception as error:
             return error_response(error.args[0], error.args[1], error.args[2], error.args[3])
-        user_id = users_db.get_id('username', username)
+        user = UsersDb.query.filter_by(username=username).first()
+        user_id = user.user_id
         token = tokenize({'user_id': int(user_id)})
         payload = json.dumps({
             "username": username,

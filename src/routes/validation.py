@@ -1,8 +1,8 @@
 from flask import request
-
-from src.database.users import users_db
-from src.errors.errors_fun import error_response
 from secrets import compare_digest
+
+from src.errorsModule.errors_fun import error_response
+from src.sqlalchemyModule.users import UsersDb
 
 
 def valid_request_type(types):
@@ -40,8 +40,8 @@ def valid_user(username, password):
         True (boolean): if password matches the username's password in the db
     """
     try:
-        user_id = users_db.get_id('username', username)
-        _, _, _, _, db_password, *_ = users_db.get_user(user_id)
+        user = UsersDb.query.filter_by(username=username).one()
+        db_password = user.password
         if compare_digest(password, db_password):
             return True
         else:
