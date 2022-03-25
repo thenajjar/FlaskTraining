@@ -1,11 +1,9 @@
-
 from flask_migrate import Migrate
 
-
-from src.sqlalchemyModule.db_connection import app, db, api, docs
-
+from src.configModule.create_app import app, db, api, docs
 
 migrate = Migrate(app, db)
+
 
 def create_resources():
     from src.routes.flask_routes import UsersApi, UsersApiGet, VerifyApi, LoginApi
@@ -22,7 +20,9 @@ def create_resources():
 
 
 def main():
+    # create the restful api end points
     create_resources()
+    # run the flask app
     app.run()
 
 

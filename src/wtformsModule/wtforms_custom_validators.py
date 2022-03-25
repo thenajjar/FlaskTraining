@@ -1,6 +1,5 @@
 from wtforms.validators import ValidationError
 from src.sqlalchemyModule.users import UsersDb
-from sqlalchemy.sql import column
 
 
 class UniqueValue(object):

@@ -1,4 +1,4 @@
-from src.sqlalchemyModule.db_connection import db
+from src.configModule.create_app import db
 
 
 class UsersDb(db.Model):

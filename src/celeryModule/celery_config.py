@@ -1,5 +1,5 @@
 from celery import Celery
-from src.sqlalchemyModule.db_connection import app
+from src.configModule.create_app import app
 
 
 def make_celery(application):

@@ -16,7 +16,7 @@ def send_otp_sms_call(phone):
 def send_otp_sms(phone, twilio_account_sid, twilio_auth_token, twilio_app_token):
     try:
         client = Client(twilio_account_sid, twilio_auth_token)
-        verification = client.verify \
+        client.verify \
             .services(twilio_app_token) \
             .verifications \
             .create(to=phone, channel='sms')

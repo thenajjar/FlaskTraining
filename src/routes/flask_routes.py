@@ -3,7 +3,7 @@ from flask_apispec import marshal_with, doc, use_kwargs
 from flask_apispec.views import MethodResource
 from flask_restful import Resource
 
-from src.sqlalchemyModule.db_connection import db
+from src.configModule.create_app import db
 from src.sqlalchemyModule.users import UsersDb
 from src.errorsModule.errors_fun import error_response
 from src.hashlibModule.encryption import encrypt
@@ -127,8 +127,22 @@ class VerifyApi(MethodResource, Resource):
             class: flask response class containing user data
         """
         user_id = request.form['user_id']
-        otp = request.form['otp']
         user = UsersDb.query.get(user_id)
+        try:
+            auth_header = request.headers['authorization']
+            if not auth_header:
+                return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
+            jwt_token = auth_header.split(" ")[1]
+            request_user_id = decode_token(jwt_token)['user_id']
+            if not request_user_id:
+                return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
+            request_user = UsersDb.query.get(request_user_id)
+            if int(user_id) != int(request_user.user_id):
+                if request_user.role != 'admin':
+                    return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
+        except Exception as error:
+            return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', error.args[3])
+        otp = request.form['otp']
         name = user.name
         email = user.email
         username = user.username

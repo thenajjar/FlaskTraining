@@ -1,14 +1,18 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from urllib.parse import quote
+from src.dotenvModule.load import getenv
 
 swagger_url = '/swagger/'
 swagger_ui_url = '/docs/'
 redis_url = 'redis://localhost:6379'
+sqlalchemy_url = 'postgresql://' + getenv('POSTGRES_USER') + ':%s@' + getenv('POSTGRES_HOST') + ':' + \
+                 getenv('POSTGRES_PORT') + '/' + getenv('POSTGRES_DATABASE')
+sqlalchemy_url = sqlalchemy_url % quote(getenv('POSTGRES_PASSWORD'))
 
 
 class FlaskProductionConfig(object):
-    """Class to store flask settings in a dictionary called settings
+    """Class to store flask settings in a dictionary called configs for production environment
     """
     configs = {
         # the flask environment
@@ -31,12 +35,12 @@ class FlaskProductionConfig(object):
         'WTF_CSRF_SECRET_KEY': "production_key",
         'CELERY_BROKER_URL': redis_url,
         'RESULT_BACKEND': redis_url,
-        'SQLALCHEMY_DATABASE_URI': 'postgresql://postgres:%s@localhost:5432/postgres' % quote('Test@123')
+        'SQLALCHEMY_DATABASE_URI': sqlalchemy_url
     }
 
 
 class FlaskDevelopmentConfig(object):
-    """Class to store flask settings in a dictionary called settings
+    """Class to store flask settings in a dictionary called configs for development environment
     """
     configs = {
         # the flask environment
@@ -59,12 +63,12 @@ class FlaskDevelopmentConfig(object):
         'WTF_CSRF_SECRET_KEY': "development_key",
         'CELERY_BROKER_URL': redis_url,
         'RESULT_BACKEND': redis_url,
-        'SQLALCHEMY_DATABASE_URI': 'postgresql://postgres:%s@localhost:5432/postgres' % quote('Test@123')
+        'SQLALCHEMY_DATABASE_URI': sqlalchemy_url
     }
 
 
 class FlaskTestingConfig(object):
-    """Class to store flask settings in a dictionary called settings
+    """Class to store flask settings in a dictionary called configs for testing environment
     """
     configs = {
         # the flask environment
@@ -87,5 +91,5 @@ class FlaskTestingConfig(object):
         'WTF_CSRF_SECRET_KEY': "testing_key",
         'CELERY_BROKER_URL': redis_url,
         'RESULT_BACKEND': redis_url,
-        'SQLALCHEMY_DATABASE_URI': 'postgresql://postgres:%s@localhost:5432/postgres' % quote('Test@123')
+        'SQLALCHEMY_DATABASE_URI': sqlalchemy_url
     }
