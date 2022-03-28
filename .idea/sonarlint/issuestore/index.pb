@@ -49,8 +49,6 @@ A
 migrations/README,8\b\8b9948ccb252e634d14f6b7f949d2e629f6f8f2a
 I
 migrations/script.py.mako,2\2\2271d770709026da8abd2dc327625dceb8d32bb5
-T
-$migrations/versions/e25c9b382662_.py,0\1\016ee61f1bcfac7d704e3d67879b7cacee37ca13
 K
 src/redisModule/__init__.py,3\d\3d56a909fefd4a44b39ad0e32db6af4c0eb1056a
 P
@@ -62,16 +60,12 @@ P
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 Q
 !src/celeryModule/celery_config.py,a\4\a42a1023d038ef58829be3cb4631b2c7bb7522bb
-N
-src/configModule/app_config.py,8\f\8fe1de428c9f5e2f2f658d15de75ce09ca9c8f04
 J
 src/configModule/config.py,5\8\58f10df171c52412bcc4206d3701a75d38abc49c
 Z
 *src/databaseModule.deprecated/database.ini,3\3\33215f0c6a12650fa4219867ff1e3c4a73765a35
 <
 .env.example,d\4\d4dae00d11854b35292c2b8a30515a9a0aa2d871
-P
- src/configModule/flask_config.py,0\7\076fdfffa9509d7be92b3a11a938a3d4c2016c6e
 H
 src/dotenvModule/load.py,0\6\063232c7ffa210d2be8b591b7a65f1e3268b5421
 N
