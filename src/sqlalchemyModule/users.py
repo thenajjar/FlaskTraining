@@ -1,4 +1,5 @@
 from src.configModule.create_app import db
+from src.configModule.create_app import cache
 
 
 class UsersDb(db.Model):
@@ -22,3 +23,12 @@ class UsersDb(db.Model):
 
     def __repr__(self):
         return f"<User {self.user_id}>"
+
+
+@cache.memoize(timeout=360)
+def get_user(user_id):
+    print("Called get user (not from cache)")
+    return UsersDb.query.get(user_id)
+
+
+
