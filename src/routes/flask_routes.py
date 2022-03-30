@@ -4,7 +4,7 @@ from flask_apispec.views import MethodResource
 from flask_restful import Resource
 
 from src.configModule.create_app import db
-from src.sqlalchemyModule.users import UsersDb
+from src.sqlalchemyModule.users import UsersDb, get_user
 from src.errorsModule.errors_fun import error_response
 from src.hashlibModule.encryption import encrypt
 from src.jwtModule.tokens import tokenize, valid_jwt, decode_token
@@ -83,11 +83,11 @@ class UsersApiGet(MethodResource, Resource):
         Returns:
             class: flask response class containing user data
         """
-        user = UsersDb.query.get(user_id)
+        user = get_user(user_id)
         try:
             jwt_token = request.headers['authorization'].split(" ")[1]
             request_user_id = decode_token(jwt_token)['user_id']
-            request_user = UsersDb.query.get(request_user_id)
+            request_user = get_user(request_user_id)
             if int(user_id) != int(request_user.user_id):
                 if request_user.role != 'admin':
                     return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
@@ -127,7 +127,7 @@ class VerifyApi(MethodResource, Resource):
             class: flask response class containing user data
         """
         user_id = request.form['user_id']
-        user = UsersDb.query.get(user_id)
+        user = get_user(user_id)
         try:
             auth_header = request.headers['authorization']
             if not auth_header:
@@ -136,7 +136,7 @@ class VerifyApi(MethodResource, Resource):
             request_user_id = decode_token(jwt_token)['user_id']
             if not request_user_id:
                 return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
-            request_user = UsersDb.query.get(request_user_id)
+            request_user = get_user(request_user_id)
             if int(user_id) != int(request_user.user_id):
                 if request_user.role != 'admin':
                     return error_response('403', 'UNAUTHORIZED', 'You dont have permission.', "")
